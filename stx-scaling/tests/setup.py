@@ -1,18 +1,25 @@
-# Initialize a payment channel
-channel = PaymentChannel(
+# Initialize channel with Stacks network details
+channel = EnhancedPaymentChannel(
     channel_id="channel_001",
     participants=["alice", "bob"],
-    initial_balances={"alice": 1000, "bob": 1000}
+    initial_balances={"alice": 1000, "bob": 1000},
+    stacks_node_url="https://stacks-node-api.mainnet.stacks.co",
+    contract_address="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
 )
 
-# Create and process transactions
+# Create transactions (they'll be automatically batched)
 tx1 = channel.create_transaction("alice", "bob", 100)
-channel.process_transaction(tx1)
+tx2 = channel.create_transaction("bob", "alice", 50)
 
-# Get channel state
+# Check channel state
 state = channel.get_channel_state()
 print(state)
 
+# Handle disputes if needed
+if dispute_detected:
+    channel.initiate_dispute("alice")
+    # Wait for dispute timeout
+    channel.resolve_dispute()
+
 # Close channel
 final_state = channel.close_channel()
-stacks_tx = create_mock_stacks_transaction(final_state)
